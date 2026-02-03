@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Multicol Export Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; max-width: 800px; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 10px; text-align: left; vertical-align: top; }
+        th { background-color: #f0f0f0; }
+        .instruction { background: #e7f3fe; border-left: 5px solid #2196F3; padding: 10px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="instruction">
+        <strong>Test Instructions:</strong>
+        <ol>
+            <li>Right-click the table below.</li>
+            <li>Select <strong>"Export to CSV (multicol)"</strong>.</li>
+            <li><strong>Expected Result:</strong>
+                <ul>
+                    <li><strong>ID:</strong> Remains 1 column.</li>
+                    <li><strong>Employee:</strong> Splits into 'Employee' and 'Employee_1' (because of Alice).</li>
+                    <li><strong>Details:</strong> Splits into 'Details', 'Details_1', and 'Details_2' (because of Project X).</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Employee</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>101</td>
+                <td>John Smith</td>
+                <td>Hired 2023</td>
+            </tr>
+            
+            <tr>
+                <td>102</td>
+                <td>Alice Jones<br>(Manager)</td>
+                <td>Full Time</td>
+            </tr>
+
+            <tr>
+                <td>103</td>
+                <td>Bob Brown</td>
+                <td>Project X<br>Phase 1<br>Pending Approval</td>
+            </tr>
+
+            <tr>
+                <td>104</td>
+                <td>Doe, Jane</td>
+                <td>Location: NY, USA</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

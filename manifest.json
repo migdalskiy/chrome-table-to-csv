@@ -1,7 +1,7 @@
 {
   "name": "Table to CSV Raw.js",
   "description": "Save table data to CSV via right-click.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "manifest_version": 3,
   "permissions": [
       "contextMenus",

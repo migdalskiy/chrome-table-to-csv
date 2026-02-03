@@ -30,6 +30,54 @@ function createTSVContent(rows) {
     return tsvContent;
 }
 
+// NEW FUNCTION: Handles splitting newlines into columns
+function createMultiColCSVContent(labels, values) {
+    // 1. Calculate the max depth (number of lines) for each column index
+    // Start with depth of 1 for every column
+    let colDepths = new Array(labels.length).fill(1);
+    
+    // Parse all values to find max splits needed
+    let parsedRows = values.map(row => {
+        return row.map((cell, colIndex) => {
+            // Split by newline (handles \n and \r\n)
+            let parts = String(cell).split(/\r?\n/);
+            // Update max depth for this specific column if this cell has more lines
+            if (parts.length > colDepths[colIndex]) {
+                colDepths[colIndex] = parts.length;
+            }
+            return parts;
+        });
+    });
+
+    // 2. Build the new Header row
+    let newHeaders = [];
+    labels.forEach((label, i) => {
+        newHeaders.push(label); // The original header
+        // Add Header_1, Header_2 based on max depth found
+        for (let d = 1; d < colDepths[i]; d++) {
+            newHeaders.push(label + "_" + d);
+        }
+    });
+
+    // 3. Flatten the data rows
+    let newRows = parsedRows.map(row => {
+        let flatRow = [];
+        row.forEach((cellParts, colIndex) => {
+            let maxDepth = colDepths[colIndex];
+            // Add existing parts
+            for (let k = 0; k < maxDepth; k++) {
+                // If part exists use it, otherwise use empty string
+                flatRow.push(cellParts[k] || ""); 
+            }
+        });
+        return flatRow;
+    });
+
+    // 4. Combine headers and rows, then use existing CSV stringifier
+    let allRows = [newHeaders].concat(newRows);
+    return createCSVContent(allRows);
+}
+
 function onClickHandler(info, tab) {
     if (!exportData) {
         console.log('No table data found to export.');
@@ -49,6 +97,11 @@ function onClickHandler(info, tab) {
         fileContent = createTSVContent(rows);
         extension = "txt";
         mimeType = "text/plain";
+    } else if (info.menuItemId === 'export_csv_multicol') {
+        // We pass labels and values separately to process the structure
+        fileContent = createMultiColCSVContent(exportData.labels, exportData.values);
+        extension = "csv";
+        mimeType = "text/csv";
     }
 
     const dataUrl = `data:${mimeType};charset=utf-8,` + encodeURIComponent(fileContent);
@@ -69,7 +122,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // 2. Force Menu Creation
-// We use 'onInstalled' to clean up and re-create to avoid ID conflicts.
 chrome.runtime.onInstalled.addListener(function() {
     chrome.contextMenus.removeAll(function() {
         chrome.contextMenus.create({
@@ -80,6 +132,12 @@ chrome.runtime.onInstalled.addListener(function() {
         chrome.contextMenus.create({
             "title": "Save Table to TXT",
             "id": "export_tsv",
+            "contexts": ["all"]
+        });
+        // NEW MENU ITEM
+        chrome.contextMenus.create({
+            "title": "Export to CSV (multicol)",
+            "id": "export_csv_multicol",
             "contexts": ["all"]
         });
     });
